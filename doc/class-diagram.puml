@@ -1,0 +1,19 @@
+@startuml blackjack
+
+class ゲーム
+class プレイヤー
+class ディーラー
+class チップ
+class 手札
+class 山札
+class カード
+
+ゲーム -- プレイヤー
+ゲーム -- ディーラー
+プレイヤー -- 手札
+ディーラー -- 手札
+手札 -- カード
+山札 -- カード
+ゲーム -- 山札 
+
+@enduml
