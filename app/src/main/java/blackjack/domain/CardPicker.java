@@ -1,5 +1,7 @@
 package blackjack.domain;
 
+import java.util.List;
+
 public interface CardPicker {
-    public int pickNumber(int total);
+    public Card pick(List<Card> cards);
 }

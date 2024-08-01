@@ -1,6 +1,7 @@
 package blackjack.domain;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,9 +22,8 @@ public class Deck {
         if (deck.isEmpty()) {
             return Optional.empty();
         }
-        int number = picker.pickNumber(deck.size());
-        Card card = deck.get(number);
-        deck.remove(number);
+        Card card = picker.pick(Collections.unmodifiableList(deck));
+        deck.remove(card);
         return Optional.of(card);
     }
 }

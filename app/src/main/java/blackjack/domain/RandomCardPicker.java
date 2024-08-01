@@ -1,5 +1,6 @@
 package blackjack.domain;
 
+import java.util.List;
 import java.util.Random;
 
 public class RandomCardPicker implements CardPicker {
@@ -8,7 +9,7 @@ public class RandomCardPicker implements CardPicker {
     public RandomCardPicker() {
         random = new Random();
     }
-    public int pickNumber(int total) {
-        return random.nextInt(total);
+    public Card pick(List<Card> cards) {
+        return cards.get(random.nextInt(cards.size()));
     }
 }
