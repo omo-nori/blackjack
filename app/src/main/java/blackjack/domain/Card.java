@@ -2,6 +2,9 @@ package blackjack.domain;
 
 import java.util.Objects;
 
+/**
+ * トランプのカードを表すクラス.
+ */
 public class Card {
     private Rank rank;
     private Suit suit;
@@ -13,10 +16,18 @@ public class Card {
         this.suit = Objects.requireNonNull(suit);
     }
 
+    /**
+     * カードのランクを取得する.
+     * @return ランク
+     */
     public Rank getRank() {
         return rank;
     }
 
+    /**
+     * カードのマークを取得する.
+     * @return マーク
+     */
     public Suit getSuit() {
         return suit;
     }
@@ -43,6 +54,11 @@ public class Card {
         return true;
     }
 
+    /**
+     * ブラックジャックにおけるカードの点数を取得する.
+     * 
+     * @return 数札はランクと同じ点数（エースは1点）。絵札は10点。
+     */
     public int getPoints() {
         if (rank.isCourtCard()) {
             return MAX_POINTS;

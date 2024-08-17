@@ -1,15 +1,16 @@
-package blackjack.ui;
+package blackjack.presentation;
 
+import java.math.BigDecimal;
 import java.util.Scanner;
 
+import blackjack.application.BlackJackService;
 import blackjack.application.GameDto;
-import blackjack.presentation.BlackJackController;
 
-public class CharacterUserInterface {
-    private BlackJackController controller;
+public class BlackJackCUI {
+    private BlackJackService service;
 
-    public CharacterUserInterface(BlackJackController controller) {
-        this.controller = controller;
+    public BlackJackCUI(BlackJackService service) {
+        this.service = service;
     }
 
     public void execute() {
@@ -50,13 +51,19 @@ public class CharacterUserInterface {
     }
 
     private boolean bet(Scanner scanner) {
-        System.out.printf("あなたの現在の所持チップは%d枚です。%n", controller.getCredit());
+        BigDecimal credit = service.getCredit();
+        System.out.printf("あなたの現在の所持チップは%s枚です。%n", credit.toString());
+        if (credit.compareTo(BigDecimal.ONE) < 0) {
+            System.out.println("賭けるチップがありません。");
+            return false;
+        }
         System.out.println("賭けるチップの枚数を入力してください。");
         if (!scanner.hasNextInt()) {
+            System.out.println("入力が正しくありません。");
             return false;
         }
         int wager = scanner.nextInt();
-        controller.bet(wager);
+        service.bet(BigDecimal.valueOf(wager));
         System.out.printf("賭けチップ枚数：%s枚%n", wager);
         System.out.println();
         sleepOneSecond();
@@ -64,8 +71,7 @@ public class CharacterUserInterface {
     }
 
     private void deal() {
-        controller.deal();
-        GameDto gameDto = controller.getGameDto();
+        GameDto gameDto = service.deal();
         System.out.println("カードを配ります。");
         System.out.println();
         sleepOneSecond();
@@ -105,7 +111,7 @@ public class CharacterUserInterface {
             }
 
             if (actionNumber == 2) {
-                gameDto = controller.stand();
+                gameDto = service.stand();
                 status = gameDto.status();
                 System.out.println("プレイヤーのターンを終了します。");
                 System.out.println();
@@ -113,7 +119,7 @@ public class CharacterUserInterface {
                 break;
             }
 
-            gameDto = controller.hit();
+            gameDto = service.hit();
             status = gameDto.status();
 
             System.out.println("カードが1枚追加されました。");
@@ -129,8 +135,9 @@ public class CharacterUserInterface {
     }
 
     private String dealerTurn() {
-        GameDto gameDto = controller.dealerTurn();
+        GameDto gameDto = service.dealerTurn();
         System.out.println("ディーラーのターンです。");
+        sleepOneSecond();
         if (gameDto.dealerHand().size() > 2) {
             System.out.println("ディーラーがカードを追加します。");
         }
@@ -144,7 +151,7 @@ public class CharacterUserInterface {
     }
 
     private void decide() {
-        String decision = controller.decide();
+        String decision = service.decide();
 
         if ("WIN_BLACKJACK".equals(decision)) {
             System.out.println("プレイヤーの勝ちです。");
@@ -158,7 +165,7 @@ public class CharacterUserInterface {
         }
         System.out.println();
         sleepOneSecond();
-        System.out.printf("あなたの所持チップは%d枚になりました。%n", controller.getCredit());
+        System.out.printf("あなたの所持チップは%s枚になりました。%n", service.getCredit().toString());
         System.out.println();
         sleepOneSecond();
     }

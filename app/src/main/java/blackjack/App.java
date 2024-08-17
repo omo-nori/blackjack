@@ -7,16 +7,22 @@ import blackjack.application.BlackJackService;
 import blackjack.domain.CardPicker;
 import blackjack.domain.CreditManager;
 import blackjack.domain.RandomCardPicker;
-import blackjack.presentation.BlackJackController;
-import blackjack.ui.CharacterUserInterface;
+import blackjack.presentation.BlackJackCUI;
 
+/**
+ * ブラックジャックのアプリケーション.
+ */
 public class App {
+    /**
+     * メインメソッド.
+     * CUIの呼び出しのみ
+     * @param args 引数は使用しない
+     */
     public static void main(String[] args) {
         CardPicker picker = new RandomCardPicker();
         CreditManager creditManager = new CreditManager();
         BlackJackService service = new BlackJackService(creditManager, picker);
-        BlackJackController controller = new BlackJackController(service);
-        CharacterUserInterface cui = new CharacterUserInterface(controller);
+        BlackJackCUI cui = new BlackJackCUI(service);
         cui.execute();
     }
 }

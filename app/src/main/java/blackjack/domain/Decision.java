@@ -3,6 +3,9 @@ package blackjack.domain;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+/**
+ * ゲームの勝敗の種類
+ */
 public enum Decision {
     WIN_NORMAL {
         @Override
@@ -30,5 +33,10 @@ public enum Decision {
         }
     };
 
+    /**
+     * 配当金を計算する.
+     * @param wager 賭け金
+     * @return 配当金。必ず整数となる。ゼロ、マイナス値がありえる。
+     */
     public abstract BigDecimal calculateDividends(BigDecimal wager);
 }
