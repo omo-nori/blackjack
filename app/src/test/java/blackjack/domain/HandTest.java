@@ -11,41 +11,12 @@ import org.junit.jupiter.api.Test;
 
 public class HandTest {
     @Test
-    public void constructorTest_firstArgsNull() {
-        Card spadeAce = new Card(Rank.ACE, Suit.SPADE);
-
-        assertThrows(NullPointerException.class, () -> new Hand(null, spadeAce));
-    }
-
-    @Test
-    public void constructorTest_secondArgsNull() {
-        Card spadeAce = new Card(Rank.ACE, Suit.SPADE);
-
-        assertThrows(NullPointerException.class, () -> new Hand(spadeAce, null));
-    }
-
-    @Test
-    public void getCardsTest() {
-        Card spadeAce = new Card(Rank.ACE, Suit.SPADE);
-        Card heartAce = new Card(Rank.ACE, Suit.HEART);
-
-        List<Card> expected = new ArrayList<>(Arrays.asList(spadeAce, heartAce));
-
-        Hand hand = new Hand(spadeAce, heartAce);
-        List<Card> actual = hand.getCards();
-        
-        assertEquals(expected, actual);
-    }
-
-    @Test
-    public void addCardTest() {
-        Card spadeAce = new Card(Rank.ACE, Suit.SPADE);
-        Card heartAce = new Card(Rank.ACE, Suit.HEART);
+    public void addCardTest_ArgsNotNull() {
         Card diamondAce = new Card(Rank.ACE, Suit.DIAMOND);
 
-        List<Card> expected = new ArrayList<>(Arrays.asList(spadeAce, heartAce, diamondAce));
+        List<Card> expected = new ArrayList<>(Arrays.asList(diamondAce));
 
-        Hand hand = new Hand(spadeAce, heartAce);
+        Hand hand = new Hand();
         hand.addCard(diamondAce);
         List<Card> actual = hand.getCards();
         
@@ -53,13 +24,21 @@ public class HandTest {
     }
 
     @Test
+    public void addCardTest_ArgsNull() {
+        Hand hand = new Hand();
+        assertThrows(NullPointerException.class, () -> hand.addCard(null));
+    }
+
+    @Test
     public void scoreTest_noAce_PipCards() {
-        Card card1 = new Card(Rank.TWO, Suit.SPADE);
-        Card card2 = new Card(Rank.TWO, Suit.HEART);
+        Card card1 = new Card(Rank.TWO, Suit.CLUB);
+        Card card2 = new Card(Rank.TWO, Suit.DIAMOND);
 
         int expected = 4;
 
-        Hand hand = new Hand(card1, card2);
+        Hand hand = new Hand();
+        hand.addCard(card1);
+        hand.addCard(card2);
         int actual = hand.score();
         
         assertEquals(expected, actual);
@@ -73,7 +52,9 @@ public class HandTest {
 
         int expected = 30;
 
-        Hand hand = new Hand(card1, card2);
+        Hand hand = new Hand();
+        hand.addCard(card1);
+        hand.addCard(card2);
         hand.addCard(card3);
         int actual = hand.score();
         
@@ -87,7 +68,9 @@ public class HandTest {
 
         int expected = 21;
 
-        Hand hand = new Hand(card1, card2);
+        Hand hand = new Hand();
+        hand.addCard(card1);
+        hand.addCard(card2);
         int actual = hand.score();
         
         assertEquals(expected, actual);
@@ -101,7 +84,9 @@ public class HandTest {
 
         int expected = 12;
 
-        Hand hand = new Hand(card1, card2);
+        Hand hand = new Hand();
+        hand.addCard(card1);
+        hand.addCard(card2);
         hand.addCard(card3);
         int actual = hand.score();
         
@@ -115,7 +100,9 @@ public class HandTest {
 
         int expected = 12;
 
-        Hand hand = new Hand(card1, card2);
+        Hand hand = new Hand();
+        hand.addCard(card1);
+        hand.addCard(card2);
         int actual = hand.score();
         
         assertEquals(expected, actual);
@@ -129,8 +116,20 @@ public class HandTest {
 
         int expected = 12;
 
-        Hand hand = new Hand(card1, card2);
+        Hand hand = new Hand();
+        hand.addCard(card1);
+        hand.addCard(card2);
         hand.addCard(card3);
+        int actual = hand.score();
+        
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void scoreTest_0points() {
+        int expected = 0;
+
+        Hand hand = new Hand();
         int actual = hand.score();
         
         assertEquals(expected, actual);

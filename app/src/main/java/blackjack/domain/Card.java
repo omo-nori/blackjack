@@ -23,7 +23,7 @@ public class Card {
 
     @Override
     public String toString() {
-        return suit.getSymbol() + rank.getNumber();
+        return suit.getSymbol() + " " + rank.getSymbol();
     }
 
     @Override

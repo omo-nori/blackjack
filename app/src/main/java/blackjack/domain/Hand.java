@@ -1,7 +1,6 @@
 package blackjack.domain;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -14,9 +13,8 @@ public class Hand {
     private static final int ACE_BONUS = 10;
     private static final int MAX_SCORE = 21;
 
-    public Hand(Card card1, Card card2) {
-        cards = new ArrayList<>(Arrays.asList(
-            Objects.requireNonNull(card1), Objects.requireNonNull(card2)));
+    public Hand() {
+        cards = new ArrayList<>();
     }
 
     public List<Card> getCards() {
@@ -24,7 +22,7 @@ public class Hand {
     }
 
     public void addCard(Card card) {
-        cards.add(card);
+        cards.add(Objects.requireNonNull(card));
     }
 
     public int score() {

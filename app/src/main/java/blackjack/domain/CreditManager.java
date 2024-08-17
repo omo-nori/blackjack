@@ -1,22 +1,31 @@
 package blackjack.domain;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 public class CreditManager {
     private BigDecimal credit;
     private BigDecimal wager;
 
-    private static final BigDecimal MIN_WAGER = new BigDecimal(1);
-    private static final BigDecimal MAX_WAGER = new BigDecimal(100);
+    private static final BigDecimal INITIAL_MIN_CREDIT = BigDecimal.ONE;
+    private static final BigDecimal INITIAL_MAX_CREDIT = BigDecimal.valueOf(100);
+    private static final BigDecimal MIN_WAGER = BigDecimal.ONE;
+    private static final BigDecimal MAX_WAGER = BigDecimal.valueOf(100);
 
     public CreditManager() {
-        this(new BigDecimal(100));
+        this(INITIAL_MAX_CREDIT);
     }
 
     public CreditManager(BigDecimal credit) {
+        if (credit.compareTo(INITIAL_MIN_CREDIT) < 0) {
+            throw new OutOfAmountRangeException();
+        }
+
+        if (credit.compareTo(INITIAL_MAX_CREDIT) > 0) {
+            throw new OutOfAmountRangeException();
+        }
+
         this.credit = credit;
-        clearWager();
+        initializeWager();
     }
 
     public BigDecimal getCredit() {
@@ -41,21 +50,14 @@ public class CreditManager {
         }
 
         this.wager = wager;
-        credit = credit.subtract(wager);
     }
 
-    public void addPayout(double raito) {
-        credit = credit.add(wager);
-        credit = credit.add(wager.multiply(new BigDecimal(String.valueOf(raito))).setScale(0, RoundingMode.DOWN));
-        clearWager();
+    public void settle(Decision decision) {
+        credit = credit.add(decision.calculateDividends(wager));
+        initializeWager();
     }
 
-    public void returnWager() {
-        credit = credit.add(wager);
-        clearWager();
-    }
-
-    public void clearWager() {
+    public void initializeWager() {
         wager = BigDecimal.ZERO;
     }
 }

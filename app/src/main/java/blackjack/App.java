@@ -3,12 +3,20 @@
  */
 package blackjack;
 
-public class App {
-    public String getGreeting() {
-        return "Hello World!";
-    }
+import blackjack.application.BlackJackService;
+import blackjack.domain.CardPicker;
+import blackjack.domain.CreditManager;
+import blackjack.domain.RandomCardPicker;
+import blackjack.presentation.BlackJackController;
+import blackjack.ui.CharacterUserInterface;
 
+public class App {
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        CardPicker picker = new RandomCardPicker();
+        CreditManager creditManager = new CreditManager();
+        BlackJackService service = new BlackJackService(creditManager, picker);
+        BlackJackController controller = new BlackJackController(service);
+        CharacterUserInterface cui = new CharacterUserInterface(controller);
+        cui.execute();
     }
 }
