@@ -1,6 +1,8 @@
 package blackjack.domain;
 
 import java.math.BigDecimal;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 
 /**
  * 賭けの軍資金を管理するクラス.
@@ -8,6 +10,7 @@ import java.math.BigDecimal;
 public class CreditManager {
     private BigDecimal credit;
     private BigDecimal wager;
+    private ResourceBundle massages = ResourceBundle.getBundle("massages");;
 
     private static final BigDecimal INITIAL_MIN_CREDIT = BigDecimal.ONE;
     private static final BigDecimal INITIAL_MAX_CREDIT = BigDecimal.valueOf(100);
@@ -29,11 +32,13 @@ public class CreditManager {
      */
     public CreditManager(BigDecimal credit) {
         if (credit.compareTo(INITIAL_MIN_CREDIT) < 0) {
-            throw new OutOfAmountRangeException();
+            throw new OutOfAmountRangeException(
+                MessageFormat.format(massages.getString("error_wager_under_limit"), INITIAL_MIN_CREDIT.toString()));
         }
 
         if (credit.compareTo(INITIAL_MAX_CREDIT) > 0) {
-            throw new OutOfAmountRangeException();
+            throw new OutOfAmountRangeException(
+                MessageFormat.format(massages.getString("error_wager_over_limit"), INITIAL_MAX_CREDIT.toString()));
         }
 
         this.credit = credit;
@@ -63,15 +68,17 @@ public class CreditManager {
      */
     public void bet(BigDecimal wager) {
         if (wager.compareTo(MIN_WAGER) < 0) {
-            throw new OutOfAmountRangeException();
+            throw new OutOfAmountRangeException(
+                MessageFormat.format(massages.getString("error_wager_under_limit"), MIN_WAGER.toString()));
         }
         
         if (wager.compareTo(MAX_WAGER) > 0) {
-            throw new OutOfAmountRangeException();
+            throw new OutOfAmountRangeException(
+                MessageFormat.format(massages.getString("error_wager_over_limit"), MAX_WAGER.toString()));
         }
 
         if (wager.compareTo(credit) > 0) {
-            throw new OutOfAmountRangeException();
+            throw new OutOfAmountRangeException(massages.getString("error_wager_over_current_credit"));
         }
 
         this.wager = wager;

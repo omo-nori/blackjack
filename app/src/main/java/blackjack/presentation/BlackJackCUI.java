@@ -1,13 +1,17 @@
 package blackjack.presentation;
 
 import java.math.BigDecimal;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 import java.util.Scanner;
 
 import blackjack.application.BlackJackService;
 import blackjack.application.GameDto;
+import blackjack.domain.OutOfAmountRangeException;
 
 public class BlackJackCUI {
     private BlackJackService service;
+    private ResourceBundle massages = ResourceBundle.getBundle("massages");
 
     public BlackJackCUI(BlackJackService service) {
         this.service = service;
@@ -25,6 +29,9 @@ public class BlackJackCUI {
             }
             deal();
             status = playerTurn(scanner);
+            if (status.equals("PLAYER_TURN")) {
+                break;
+            }
 
             if (status.equals("DEALER_TURN")) {
                 status = dealerTurn();
@@ -34,13 +41,13 @@ public class BlackJackCUI {
                 decide();
             }
         }
-        System.out.println("ブラックジャックを終了します。");
+        System.out.println(massages.getString("end"));
         scanner.close();
     }
 
     private boolean playGame(Scanner scanner) {
-        System.out.println("ブラックジャックをしますか？");
-        System.out.println("1: はい　2: いいえ");
+        System.out.println(massages.getString("select_start"));
+        System.out.println(massages.getString("option_yes_no"));
         if (!scanner.hasNextInt()) {
             return false;
         }
@@ -52,19 +59,25 @@ public class BlackJackCUI {
 
     private boolean bet(Scanner scanner) {
         BigDecimal credit = service.getCredit();
-        System.out.printf("あなたの現在の所持チップは%s枚です。%n", credit.toString());
+        System.out.println(MessageFormat.format(massages.getString("current_credit"), credit.toString()));
         if (credit.compareTo(BigDecimal.ONE) < 0) {
-            System.out.println("賭けるチップがありません。");
+            System.out.println(massages.getString("error_no_credit"));
             return false;
         }
-        System.out.println("賭けるチップの枚数を入力してください。");
+        System.out.println(massages.getString("place_bet"));
         if (!scanner.hasNextInt()) {
-            System.out.println("入力が正しくありません。");
+            System.out.println(massages.getString("error_invalid"));
             return false;
         }
         int wager = scanner.nextInt();
-        service.bet(BigDecimal.valueOf(wager));
-        System.out.printf("賭けチップ枚数：%s枚%n", wager);
+        try {
+            service.bet(BigDecimal.valueOf(wager));
+        } catch(OutOfAmountRangeException e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+        
+        System.out.println(MessageFormat.format(massages.getString("wager"), wager));
         System.out.println();
         sleepOneSecond();
         return true;
@@ -72,22 +85,21 @@ public class BlackJackCUI {
 
     private void deal() {
         GameDto gameDto = service.deal();
-        System.out.println("カードを配ります。");
+        System.out.println(massages.getString("deal_cards"));
         System.out.println();
         sleepOneSecond();
 
-        System.out.print("あなたのカード：");
+        System.out.print(massages.getString("player_cards"));
         gameDto.playerHand().stream().forEach(card -> System.out.printf("[%s] ", card));
         System.out.println();
-        System.out.printf("得点：%d点%n", gameDto.playerScore());
+        System.out.println(MessageFormat.format(massages.getString("score"), gameDto.playerScore()));
         System.out.println();
         sleepOneSecond();
 
-        System.out.print("ディーラーのカード：");
+        System.out.print(massages.getString("dealer_cards"));
         System.out.printf("[%s] ", gameDto.dealerHand().get(0));
         System.out.println("[??]");
-        System.out.println("得点：??点");
-        System.out.println();
+        System.out.println(MessageFormat.format(massages.getString("score"), "??"));
         System.out.println();
         sleepOneSecond();
     }
@@ -96,24 +108,24 @@ public class BlackJackCUI {
         GameDto gameDto;
         String status = "PLAYER_TURN";
         while (status.equals("PLAYER_TURN")) {
-            System.out.println("アクションを選択してください。");
-            System.out.println("1: カードを引く　2: ターンを終了する");
+            System.out.println(massages.getString("select_player_action"));
+            System.out.println(massages.getString("option_player_action"));
 
             if (!scanner.hasNextInt()) {
-                System.out.println("入力が正しくありません。");
-                continue;
+                System.out.println(massages.getString("error_invalid"));
+                break;
             }
 
             int actionNumber = scanner.nextInt();
             if (actionNumber != 1 && actionNumber != 2) {
-                System.out.println("選択肢の範囲内で入力してください。");
-                continue;
+                System.out.println(massages.getString("error_out_of_range"));
+                break;
             }
 
             if (actionNumber == 2) {
                 gameDto = service.stand();
                 status = gameDto.status();
-                System.out.println("プレイヤーのターンを終了します。");
+                System.out.println(massages.getString("player_turn_end"));
                 System.out.println();
                 sleepOneSecond();
                 break;
@@ -122,12 +134,12 @@ public class BlackJackCUI {
             gameDto = service.hit();
             status = gameDto.status();
 
-            System.out.println("カードが1枚追加されました。");
+            System.out.println(massages.getString("add_player_card"));
             sleepOneSecond();
-            System.out.print("あなたのカード：");
+            System.out.print(massages.getString("player_cards"));
             gameDto.playerHand().stream().forEach(card -> System.out.printf("[%s] ", card));
             System.out.println();
-            System.out.printf("得点：%d点%n", gameDto.playerScore());
+            System.out.println(MessageFormat.format(massages.getString("score"), gameDto.playerScore()));
             System.out.println();
             sleepOneSecond();
         }
@@ -136,16 +148,15 @@ public class BlackJackCUI {
 
     private String dealerTurn() {
         GameDto gameDto = service.dealerTurn();
-        System.out.println("ディーラーのターンです。");
+        System.out.println(massages.getString("dealer_turn_start"));
         sleepOneSecond();
         if (gameDto.dealerHand().size() > 2) {
-            System.out.println("ディーラーがカードを追加します。");
+            System.out.println(massages.getString("add_dealer_card"));
         }
-        System.out.print("ディーラーのカード：");
+        System.out.print(massages.getString("dealer_cards"));
         gameDto.dealerHand().stream().forEach(card -> System.out.printf("[%s] ", card));
         System.out.println();
-        System.out.printf("得点：%d点%n", gameDto.dealerScore());
-        System.out.println();
+        System.out.println(MessageFormat.format(massages.getString("score"), gameDto.dealerScore()));
         sleepOneSecond();
         return gameDto.status();
     }
@@ -154,18 +165,18 @@ public class BlackJackCUI {
         String decision = service.decide();
 
         if ("WIN_BLACKJACK".equals(decision)) {
-            System.out.println("プレイヤーの勝ちです。");
-            System.out.println("プレイヤーはブラックジャックです。");
+            System.out.println(massages.getString("decision_win"));
+            System.out.println(massages.getString("decision_blackjack"));
         } else if ("WIN_NORMAL".equals(decision)) {
-            System.out.println("プレイヤーの勝ちです。");
+            System.out.println(massages.getString("decision_win"));
         } else if ("LOSE".equals(decision)) {
-            System.out.println("プレイヤーの負けです。");
+            System.out.println(massages.getString("decision_lose"));
         } else {
-            System.out.println("引き分けです。");
+            System.out.println(massages.getString("decision_tie"));
         }
         System.out.println();
         sleepOneSecond();
-        System.out.printf("あなたの所持チップは%s枚になりました。%n", service.getCredit().toString());
+        System.out.println(MessageFormat.format(massages.getString("current_credit"), service.getCredit().toString()));
         System.out.println();
         sleepOneSecond();
     }

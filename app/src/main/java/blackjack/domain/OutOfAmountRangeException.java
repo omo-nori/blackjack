@@ -7,4 +7,7 @@ public class OutOfAmountRangeException extends RuntimeException {
     public OutOfAmountRangeException() {
         super();
     }
+    public OutOfAmountRangeException(String massage) {
+        super(massage);
+    }
 }
